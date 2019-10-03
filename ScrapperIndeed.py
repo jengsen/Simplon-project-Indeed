@@ -44,12 +44,12 @@ class ScrapperIndeed():
                 salary = 'None'
             # Scraping le type de contrat sinon chercher une autre position
             try:
-                if len(browser.find_elements_by_class_name('jobMetadataHeader-itemWithIcon-label')) == 2:
-                    if browser.find_elements_by_class_name('jobMetadataHeader-itemWithIcon-label')[1] != salary:
-                        contrat = browser.find_element_by_class_name('jobMetadataHeader-itemWithIcon-label')[1].text
-                elif len(browser.find_elements_by_class_name('jobMetadataHeader-itemWithIcon-label')) == 3:
-                    if browser.find_elements_by_class_name('jobMetadataHeader-itemWithIcon-label')[1] != salary:
-                        contrat = browser.find_element_by_class_name('jobMetadataHeader-itemWithIcon-label')[1].text
+                if len(self.browser.find_elements_by_class_name('jobMetadataHeader-itemWithIcon-label')) == 2:
+                    if self.browser.find_elements_by_class_name('jobMetadataHeader-itemWithIcon-label')[1] != salary:
+                        contrat = self.browser.find_element_by_class_name('jobMetadataHeader-itemWithIcon-label')[1].text
+                elif len(self.browser.find_elements_by_class_name('jobMetadataHeader-itemWithIcon-label')) == 3:
+                    if self.browser.find_elements_by_class_name('jobMetadataHeader-itemWithIcon-label')[1] != salary:
+                        contrat = self.browser.find_element_by_class_name('jobMetadataHeader-itemWithIcon-label')[1].text
                 if salary == contrat:
                     contrat = None
             except:
