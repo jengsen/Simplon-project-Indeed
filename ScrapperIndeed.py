@@ -1,18 +1,16 @@
-class ScrapperIndeed():
-    from selenium import webdriver
-    from selenium.webdriver.common.keys import Keys
-    #from selenium.webdriver.common.desired_capabilities import DesiredCapabilities
-    import pandas as pd
-    import time
+from selenium import webdriver
+from selenium.webdriver.common.keys import Keys
+import time
 
-    def __init__(self, mongoCollection,browser):
+class ScrapperIndeed():
+    def __init__(self, mongoCollection):
         """
 
         :param mongoCollection: collection mongo
         :param browser: selenium object webdriver.Chrome()
         """
         self.mongoCollection=mongoCollection
-        self.browser=browser
+        self.browser=webdriver.Chrome()
 
 
     def scrapp_page(self, job, location):
@@ -22,10 +20,58 @@ class ScrapperIndeed():
         :param location: string current location searched
         :return:
         """
-        # Code Ursula
+        for chaque in self.browser.find_elements_by_class_name('result'):
+            chaque.find_element_by_class_name('jobtitle').click()
+            time.sleep(0.3)
+            try:
+                title = chaque.find_element_by_class_name('jobtitle').text
+            except:
+                title = 'None'
+            # Scraping le nom de la boite sinon rien
+            try:
+                boite = chaque.find_element_by_class_name('company').text
+            except:
+                boite = 'Nane'
+            # Scraping le Ville sinon rien
+            try:
+                city = chaque.find_element_by_class_name('location').text
+            except:
+                city = 'None'
+            # Scraping le salaire sinon rien
+            try:
+                salary = chaque.find_element_by_class_name('salaryText').text
+            except:
+                salary = 'None'
+            # Scraping le type de contrat sinon chercher une autre position
+            try:
+                if len(browser.find_elements_by_class_name('jobMetadataHeader-itemWithIcon-label')) == 2:
+                    if browser.find_elements_by_class_name('jobMetadataHeader-itemWithIcon-label')[1] != salary:
+                        contrat = browser.find_element_by_class_name('jobMetadataHeader-itemWithIcon-label')[1].text
+                elif len(browser.find_elements_by_class_name('jobMetadataHeader-itemWithIcon-label')) == 3:
+                    if browser.find_elements_by_class_name('jobMetadataHeader-itemWithIcon-label')[1] != salary:
+                        contrat = browser.find_element_by_class_name('jobMetadataHeader-itemWithIcon-label')[1].text
+                if salary == contrat:
+                    contrat = None
+            except:
+                try:
+                    contrat = browser.find_element_by_xpath('//*[@id="vjs-tab-job"]/div[1]/div[2]/span[2]').text
+                except:
+                    contrat = None
+            # Scraping le description sinon rien
+            try:
+                describe = chaque.find_element_by_class_name('summary').text
+            except:
+                describe = 'None'
+            # Scraping le date de publication sinon rien
+            try:
+                publish_date = self.browser.find_element_by_xpath('//*[@id="vjs-footer"]/div[1]/div/span[1]').text
+            except:
+                publish_date = 'None'
+            w = {"Titre": title, "Entreprise": boite, "Ville": city, "Salaire": salary, "Type_de_contrat": contrat,
+                 "Descriptif_du_poste": describe, "Date_de_publication": publish_date, "Scrapped_job" : job, "Scrapped_location" : location}
 
-        if self.mongoCollection.find_one({"Titre": titre, 'Descriptif du poste': describe}) == None:
-            self.mongoCollection.insert_one(w)
+            if self.mongoCollection.find_one({"Titre": title, 'Descriptif_du_poste': describe}) == None:
+                self.mongoCollection.insert_one(w)
 
     def start(self):
         """
@@ -49,7 +95,7 @@ class ScrapperIndeed():
             popUp.click()
             time.sleep(1)
         except:
-            pass
+            time.sleep(0.1)
 
 
 
@@ -73,6 +119,9 @@ class ScrapperIndeed():
             time.sleep(3)
             self.check_pop_up()
             return True
+        except:
+            return False
+
 
     def search_offers(self, job, location):
         """
@@ -81,6 +130,18 @@ class ScrapperIndeed():
         :param location: string of location
         :return:
         """
+        # Write job
+        entrer_job = self.browser.find_element_by_xpath('//*[@id="text-input-what"]')
+        entrer_job.send_keys(job)
+        time.sleep(1)
+        # write location
+        entrer_city = self.browser.find_element_by_xpath('//*[@id="text-input-where"]')
+        entrer_city.send_keys(location)
+        time.sleep(1)
+        # search
+        button_search = self.browser.find_element_by_class_name("icl-Button")
+        button_search.click()
+        time.sleep(3)
 
     def scrapp_search(self, job, location):
         """
@@ -91,9 +152,9 @@ class ScrapperIndeed():
         """
         self.start()
         self.search_offers(job, location)
-        self.scrapp_page(job,location)
+        self.scrapp_page(job, location)
         while self.next_page():
-            self.scrapp_page()
+            self.scrapp_page(job, location)
         self.browser.quit()
 
 
