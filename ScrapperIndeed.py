@@ -31,7 +31,7 @@ class ScrapperIndeed():
             try:
                 boite = chaque.find_element_by_class_name('company').text
             except:
-                boite = 'Nane'
+                boite = 'None'
             # Scraping le Ville sinon rien
             try:
                 city = chaque.find_element_by_class_name('location').text
@@ -54,17 +54,17 @@ class ScrapperIndeed():
                     contrat = None
             except:
                 try:
-                    contrat = browser.find_element_by_xpath('//*[@id="vjs-tab-job"]/div[1]/div[2]/span[2]').text
+                    contrat = self.browser.find_element_by_xpath('//*[@id="vjs-tab-job"]/div[1]/div[2]/span[2]').text
                 except:
                     contrat = None
             # Scraping le description sinon rien
             try:
-                describe = chaque.find_element_by_class_name('summary').text
+                describe = self.browser.find_element_by_xpath('//*[@id="vjs-desc"]').text
             except:
                 describe = 'None'
             # Scraping le date de publication sinon rien
             try:
-                publish_date = self.browser.find_element_by_xpath('//*[@id="vjs-footer"]/div[1]/div/span[1]').text
+                publish_date = self.browser.find_element_by_class_name('date ').text
             except:
                 publish_date = 'None'
             w = {"Titre": title, "Entreprise": boite, "Ville": city, "Salaire": salary, "Type_de_contrat": contrat,
@@ -132,10 +132,12 @@ class ScrapperIndeed():
         """
         # Write job
         entrer_job = self.browser.find_element_by_xpath('//*[@id="text-input-what"]')
+        entrer_job.send_keys(Keys.CONTROL, "a")
         entrer_job.send_keys(job)
         time.sleep(1)
         # write location
         entrer_city = self.browser.find_element_by_xpath('//*[@id="text-input-where"]')
+        entrer_city.send_keys(Keys.CONTROL, "a")
         entrer_city.send_keys(location)
         time.sleep(1)
         # search
