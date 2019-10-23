@@ -1,7 +1,9 @@
+from sklearn.linear_model import LogisticRegression
 from sklearn.svm import SVC
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.ensemble import AdaBoostClassifier
 from sklearn.ensemble import GradientBoostingClassifier
+from xgboost import XGBClassifier
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import GridSearchCV
@@ -55,6 +57,10 @@ class MLIndeed():
         clf.fit(self.X_train, self.y_train)
         return clf
 
+    def grid_search_log_reg(self, params, scoring):
+        log_reg = LogisticRegression(random_state=0)
+        return self.grid_search(log_reg, params, scoring)
+
 
     def grid_search_svm(self, params, scoring):
         svm = SVC(random_state=0)
@@ -76,11 +82,18 @@ class MLIndeed():
         return self.grid_search(gboost, params, scoring)
 
 
+    def grid_search_xgboost(self, params, scoring):
+        xgboost = XGBClassifier(random_state=0)
+        return self.grid_search(xgboost, params, scoring)
+
+
     def best_models(self, params, scoring):
+        self.bestModels['Log reg'] = self.grid_search_log_reg(params['Log Reg'], scoring)
         self.bestModels['SVM'] = self.grid_search_svm(params['SVM'], scoring)
         self.bestModels['Random Forest'] = self.grid_search_random_forest(params['Random Forest'], scoring)
         self.bestModels['Ada Boost'] = self.grid_search_adaboost(params['Ada Boost'], scoring)
         self.bestModels['Gradient Boost'] = self.grid_search_gboost(params['Gradient Boost'], scoring)
+        self.bestModels['X Gradient Boost'] = self.grid_search_xgboost(params['X Gradient Boost'], scoring)
 
 
 

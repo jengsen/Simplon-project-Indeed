@@ -22,7 +22,7 @@ class ScrapperIndeed():
         """
         for chaque in self.browser.find_elements_by_class_name('result'):
             chaque.find_element_by_class_name('jobtitle').click()
-            time.sleep(0.3)
+            time.sleep(0.5)
             try:
                 title = chaque.find_element_by_class_name('jobtitle').text
             except:
@@ -68,7 +68,7 @@ class ScrapperIndeed():
             except:
                 publish_date = 'None'
             w = {"Titre": title, "Entreprise": boite, "Ville": city, "Salaire": salary, "Type_de_contrat": contrat,
-                 "Descriptif_du_poste": describe, "Date_de_publication": publish_date, "Scrapped_job" : job, "Scrapped_location" : location}
+                 "Descriptif_du_poste": describe, "Date_de_publication": publish_date, "Scrapped_job": job, "Scrapped_location": location}
 
             if self.mongoCollection.find_one({"Titre": title, 'Descriptif_du_poste': describe}) == None:
                 self.mongoCollection.insert_one(w)

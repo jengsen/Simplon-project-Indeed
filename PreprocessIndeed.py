@@ -10,11 +10,11 @@ class PreprocessIndeed():
     def __init__(self, pathJSON):
         self.pathJSON = pathJSON
         self.data = pd.read_json(pathJSON, lines=True, encoding='utf-8')
-        self.df = self.data
+        self.df = self.data.copy()
 
     def preprocess_df(self, nlp_object_titre, nlp_object_description, correlation_titre=0, correlation_description=0):
         """
-        Preprocess the main dataframe:
+        Preprocess the main dataframe
         :return:
         """
 
@@ -47,6 +47,7 @@ class PreprocessIndeed():
 
         # correlation matrix with the salary if correlation > 0
         if correlation_titre == 0:
+
             self.df['Titre_' + df_titre.columns] = df_titre[df_titre.columns]
         else:
             # keep features with correlation with Salaire > correlation_titre
@@ -91,7 +92,8 @@ def nlp(df, nlpObject):
 
     # vectorize
     nlpObject.fit(df_nlp['Cleaned_strings'])
-    return pd.DataFrame(nlpObject.transform(df_nlp['Cleaned_strings']).todense(), columns=nlpObject.get_feature_names(),
+    columns = [column.replace(' ', '_') for column in nlpObject.get_feature_names()]
+    return pd.DataFrame(nlpObject.transform(df_nlp['Cleaned_strings']).todense(), columns=columns,
                         index=df.index)
 
 
@@ -212,7 +214,8 @@ def preprocess_salaires_3clusters(salaire):
     :param salaire:
     :return:
     '''
-    hist=[0, 16200, 42480]
+    # hist=[0, 16200, 42480]
+    hist = [0, 24364.6, 43901.1, 67562.4]
     for i in range(0,len(hist)-1):
         if salaire < hist[i+1]:
             return i
