@@ -10,3 +10,7 @@ numpy
 Pandas
 dash_table
 json
+functools
+pymongo
+dash_table
+os
