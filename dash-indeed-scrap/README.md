@@ -1,4 +1,6 @@
-1er jet de l'appli dash "Scraping of Indeed"
+Application 'Projet Indeed' 
+
+Vérifiez si vous avez les librairies pour éviter le bug(elles sont toutes listées dans le fichier requirements.txt)
 
 ## Resources
 
