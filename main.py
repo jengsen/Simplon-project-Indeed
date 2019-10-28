@@ -24,7 +24,7 @@ countVec_titre = CountVectorizer(ngram_range=(1, 2), min_df=.005, max_df=0.8)
 countVec_description = CountVectorizer(ngram_range=(1, 2), min_df=.02, max_df=0.8)
 preprocess = PreprocessIndeed('data/BDD_14_10_2019.json')
 
-preprocess.preprocess_df(countVec_titre, countVec_description, correlation_description=0.1, correlation_titre=0.1)
+preprocess.preprocess_df(countVec_titre, countVec_description, correlation_description=0.1, correlation_titre=0.1, save_name='10correlation')
 # preprocess.preprocess_df(countVec_titre, countVec_description)
 
 X_train, X_test, y_train, y_test = \
