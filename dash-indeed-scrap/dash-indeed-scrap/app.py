@@ -412,6 +412,7 @@ def update_graph(rows):
      dash.dependencies.Input("select-zaxis", "value")]
 
 )
+
 def ugdate_figure(selected_x, selected_y, selected_z):
     z = df2[selected_z]
     trace = [go.Scatter3d(
