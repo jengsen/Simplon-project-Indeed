@@ -1,6 +1,11 @@
-Application 'Projet Indeed' 
 
-Vérifiez si vous avez les librairies pour éviter le bug(elles sont toutes listées dans le fichier requirements.txt)
+Application 'Projet Indeed' : 
+
+Tout les fichiers à executer sont dans ce dossier.
+
+Pour lancer le dashboard 'run app.py'
+
+Vérifiez si vous avez les librairies pour éviter le bug(elles sont toutes listées dans le fichier requirements.txt) !! 
 
 ## Resources
 
