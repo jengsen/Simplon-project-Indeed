@@ -22,6 +22,8 @@ df2 = pd.read_csv("data/skills_bbd.csv", encoding='utf8', engine='python')
 
 df= pd.read_csv("data/scrapindeed.csv", encoding='utf8', engine='python')
 
+df_pred = pd.read_csv("data/mean_pred_salaries.csv", encoding='utf8', engine='python')
+
 #Lien Github
 GITHUB_LINK = os.environ.get(
     "GITHUB_LINK",
@@ -88,9 +90,12 @@ app.layout = html.Div([
                         #J'ai mis du Lorem Ipsum en attendant du texte pour le début
                         html.P(
                             """
-                            Hac ex causa conlaticia stipe Valerius humatur ille Publicola et subsidiis amicorum mariti inops cum 
-                            liberis uxor alitur Reguli et dotatur ex aerario filia Scipionis, cum nobilitas florem adultae virginis
-                            diuturnum absentia pauperis erubesceret patris. 
+                            Contexte :  
+                            
+                            Je suis CEO d’une boite qui s’occupe de faire des statistiques sur l’emploi dans le secteur du développement informatique et de la data à Paris, Lyon, Toulouse, Nantes et Bordeaux. 
+                            Je m’intéresse tout particulièrement aux différences de salaires entre ces métiers + villes.
+                            Je vous mandate afin de me fournir une étude sur ce marché à présenter sous forme de Dashboard.
+
                             """
                         ),
                         html.A(
@@ -217,13 +222,24 @@ app.layout = html.Div([
                                 dcc.Graph(id='selected',
                                 figure={
                                         'data': [go.Scatter(
-                                        x=df2['mean'],
-                                        y=df2['stdev'],
+                                        x=df_pred['prediction'],
+                                        y=df_pred['avg_salaire'],
                                         name='Différence entre la moyenne et la prédiction du salaire',
-                                        text=df2['skill'],
+                                        text=df_pred['skills'],
                                         mode='markers',
-                                        marker_color=df2['mean']
-                                        )]},
+                                        marker_color=df_pred['avg_salaire']
+                                        ),
+                                        go.Scatter(
+                                            x=[0,140000], y=[0,140000],
+                                            line_color='Blue',
+                                            name='Average'
+                                        )],
+                                        "layout": go.Layout(
+                                            title='Prédiction Vs Moyenne',
+                                            xaxis={"title": "Prédiction"},
+                                            yaxis={"title": "Salaire Moyen"},
+                                        ),
+                                },
                                 ),
                             ]),
                         ]),
@@ -252,7 +268,16 @@ def render_content(tab):
         ])
     elif tab == 'tab-2':
         return html.Div([
-            html.Div(children='At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.At vero eos et accusamus et iusto odio dignissimos ducimus qui blanditiis praesentium voluptatum deleniti atque corrupti quos dolores et quas molestias excepturi sint occaecati cupiditate non provident, similique sunt in culpa qui officia deserunt mollitia animi, id est laborum et dolorum fuga.')
+            html.Div(children='Métier (développeur, data scientist…)'
+                                'Type de contrat recherché (CDI, CDD, freelance…)'
+                                'Lieu de recherche (Paris, Toulouse, …)'
+                     'Les infos à scraper :'
+                                'Titre'
+                                'Nom de la boite'
+                                'Adresse'
+                               ' Salaire'
+                                'Descriptif du poste'
+                                'Date de publication de l’annonce')
         ])
 #Callback Pour le heatmap et l'histogram
 @app.callback(Output('tabs-content-props2', 'children'),
@@ -387,6 +412,7 @@ def update_graph(rows):
      dash.dependencies.Input("select-zaxis", "value")]
 
 )
+
 def ugdate_figure(selected_x, selected_y, selected_z):
     z = df2[selected_z]
     trace = [go.Scatter3d(
