@@ -7,7 +7,7 @@ from xgboost import XGBClassifier
 from sklearn.metrics import confusion_matrix
 from sklearn.metrics import accuracy_score
 from sklearn.model_selection import GridSearchCV
-
+import pickle
 
 class MLIndeed():
     def __init__(self, X_train, X_test, y_train, y_test):
@@ -94,6 +94,11 @@ class MLIndeed():
         self.bestModels['Ada Boost'] = self.grid_search_adaboost(params['Ada Boost'], scoring)
         self.bestModels['Gradient Boost'] = self.grid_search_gboost(params['Gradient Boost'], scoring)
         self.bestModels['X Gradient Boost'] = self.grid_search_xgboost(params['X Gradient Boost'], scoring)
+
+    def save_models(self, save_name='bestmodel'):
+        for model in self.bestModels:
+            filename = 'serialized_models/' + save_name + '_' + str(model)
+            pickle.dump(self.bestModels[model].best_estimator_, open(filename, 'wb'))
 
 
 

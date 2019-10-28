@@ -3,6 +3,7 @@ import numpy as np
 import re
 from nltk.corpus import stopwords
 from gensim.utils import tokenize
+import pickle
 from sklearn.feature_extraction.text import CountVectorizer
 
 
@@ -12,7 +13,8 @@ class PreprocessIndeed():
         self.data = pd.read_json(pathJSON, lines=True, encoding='utf-8')
         self.df = self.data.copy()
 
-    def preprocess_df(self, nlp_object_titre, nlp_object_description, correlation_titre=0, correlation_description=0):
+    def preprocess_df(self, nlp_object_titre, nlp_object_description, correlation_titre=0, correlation_description=0,
+                      save_name='preprocess'):
         """
         Preprocess the main dataframe
         :return:
@@ -30,20 +32,18 @@ class PreprocessIndeed():
         self.df['Ville_' + df_ville.columns] = df_ville[df_ville.columns]
 
         # group salaries
-        # delete salaries XX € per week : too many mistakes represents 2%
-        # of rows with a salary
+        # delete salaries XX € per week : too many mistakes and it is only 2% of the offers
         self.df = self.df.loc[self.df['Salaire'].apply(lambda x: 'semaine' not in x), :]
         # preprocess strings in Salaire
         self.df['Salaire'] = self.df['Salaire'].apply(preprocess_salaires)
         # create classes in Salaire
-        self.df['Salaire'] = self.df['Salaire'].apply(preprocess_salaires_3clusters)
+        self.df['Salaire'] = self.df['Salaire'].apply(preprocess_salaires_kmean_clusters)
 
         # NLP titre
         # stop_words
         stop_words = set(stopwords.words('french'))
-        #AJOUTER h f ref
         nlp_object_titre.set_params(stop_words=stop_words)
-        df_titre = nlp(self.df['Titre'], nlp_object_titre)
+        df_titre = nlp(self.df['Titre'], nlp_object_titre, save_name='titre'+save_name)
 
         # correlation matrix with the salary if correlation > 0
         if correlation_titre == 0:
@@ -59,9 +59,8 @@ class PreprocessIndeed():
         # NLP description
         # stop_words
         stop_words = set(stopwords.words('french'))
-        # AJOUTER h f ref
         nlp_object_description.set_params(stop_words=stop_words)
-        df_description = nlp(self.df['Descriptif_du_poste'], nlp_object_description)
+        df_description = nlp(self.df['Descriptif_du_poste'], nlp_object_description, save_name='description'+save_name)
 
         # correlation matrix with the salary if correlation > 0
         if correlation_description == 0:
@@ -78,9 +77,10 @@ class PreprocessIndeed():
                       'Scrapped_location', 'Titre', 'Descriptif_du_poste'], inplace=True, axis=1)
 
 
-def nlp(df, nlpObject):
+def nlp(df, nlpObject, save_name='preprocess'):
     """
     tokenize and vectorize the df according to nlpObject
+    :param save_name: name of the file saved
     :param nlpObject: nlpObject (countverizer, word2vec...)
     :param df: dataframe containing the strings to countvectorize
     :return: df containing max_features rows with the number of appearance of each word
@@ -93,6 +93,9 @@ def nlp(df, nlpObject):
     # vectorize
     nlpObject.fit(df_nlp['Cleaned_strings'])
     columns = [column.replace(' ', '_') for column in nlpObject.get_feature_names()]
+
+    # Save the fitted object in a file
+    pickle.dump(nlpObject, open('serialized_models/' + save_name, 'wb'))
     return pd.DataFrame(nlpObject.transform(df_nlp['Cleaned_strings']).todense(), columns=columns,
                         index=df.index)
 
@@ -208,7 +211,7 @@ def preprocess_salaires(salary):
             return (int(x[0]) * 35 * 52)
 
 
-def preprocess_salaires_3clusters(salaire):
+def preprocess_salaires_kmean_clusters(salaire):
     '''
     creates 3 Salaire classes
     :param salaire:
