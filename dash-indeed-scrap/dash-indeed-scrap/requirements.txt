@@ -1,7 +1,7 @@
 dash
 gunicorn==19.9.0
 stats==0.1.2a
-scipy==1.3.0
+scipy==1.10.0
 dash.dependencies
 dash_html_components
 dash_core_components
